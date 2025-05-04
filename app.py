@@ -7,6 +7,30 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from functools import wraps
 from datetime import datetime
 from math import ceil
+import csv
+import random
+
+# Chargement des sujets une fois au démarrage
+SUJETS_PATH = "sujets.csv"
+SUJETS = []
+
+with open(SUJETS_PATH, newline='', encoding='utf-8') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        SUJETS.append(row)
+
+@app.route("/api/proposer_sujet", methods=["GET"])
+def api_proposer_sujet():
+    if not SUJETS:
+        return {"ok": False, "error": "Aucun sujet disponible"}, 404
+    sujet = random.choice(SUJETS)
+    return {
+        "ok": True,
+        "module": sujet.get("MODULE", ""),
+        "matiere": sujet.get("MATIERE", ""),
+        "chapitre": sujet.get("CHAPITRE", ""),
+        "titre": sujet.get("TITRE DU PARAGRAPHE", ""),
+    }
 
 # --- CONFIG ---
 SECRET_KEY = "super-secret-change-me"
