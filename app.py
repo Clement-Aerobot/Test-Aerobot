@@ -10,10 +10,14 @@ from math import ceil
 import csv
 import random
 
+# --- CONFIG ---
+SECRET_KEY = "super-secret-change-me"
+app = Flask(__name__)
+app.secret_key = SECRET_KEY
+
 # Chargement des sujets une fois au démarrage
 SUJETS_PATH = "sujets.csv"
 SUJETS = []
-
 with open(SUJETS_PATH, newline='', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
@@ -31,11 +35,6 @@ def api_proposer_sujet():
         "chapitre": sujet.get("CHAPITRE", ""),
         "titre": sujet.get("TITRE DU PARAGRAPHE", ""),
     }
-
-# --- CONFIG ---
-SECRET_KEY = "super-secret-change-me"
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
 
 # --- UTILS DB ---
 def get_db():
