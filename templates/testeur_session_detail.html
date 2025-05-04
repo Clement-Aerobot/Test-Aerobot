@@ -79,6 +79,41 @@
             </button>
         </form>
     </div>
+<script>
+    // Version totalement inline
+    document.addEventListener('DOMContentLoaded', function () {
+        let btn = document.getElementById("generate-btn");
+        if (btn) {
+            btn.addEventListener('click', function () {
+                btn.innerText = "Recherche…";
+                btn.disabled = true;
+                fetch("{{ url_for('api_proposer_sujet') }}")
+                    .then(r => r.json())
+                    .then(res => {
+                        btn.innerText = "Proposer un sujet";
+                        btn.disabled = false;
+                        if (res.ok) {
+                            let infos = `
+                                <b>Module :</b> ${res.module}<br>
+                                <b>Matière :</b> ${res.matiere}<br>
+                                <b>Chapitre :</b> ${res.chapitre}<br>
+                                <b>Titre du paragraphe :</b> ${res.titre}
+                            `;
+                            let popup = window.open("", "SujetPropose", "width=440,height=320,top=180,left=350");
+                            popup.document.write(`<html><head><title>Sujet proposé</title></head><body style="font-family:sans-serif;padding:30px;text-align:center;"><h3>Sujet proposé</h3><div style='text-align:left;margin:18px auto;font-size:1.12em;max-width:320px;'>${infos}</div><button onclick="window.close();" style="margin-top:16px;font-size:1.05em;padding:8px 24px;cursor:pointer;">Fermer</button></body></html>`);
+                        } else {
+                            alert("Erreur : " + (res.error || "aucun sujet"));
+                        }
+                    })
+                    .catch(err => {
+                        btn.innerText = "Proposer un sujet";
+                        btn.disabled = false;
+                        alert("Erreur réseau ou serveur.");
+                    });
+            });
+        }
+    });
+</script>
     <!-- AVERTISSEMENT Retour -->
     <div style="max-width:540px;margin:30px auto 0 auto; text-align:center; background:#f9eede; color:#b28f12; border-radius:10px; padding:15px 24px 11px 24px; font-size:1.07em;">
         <b>⚠️ Attention :</b> Il est conseillé de <b>clôturer</b> la session avant de revenir à vos sessions.<br>
@@ -136,48 +171,3 @@
 </table>
 
 {% endblock %}
-
-<!-- JS inchangé -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    let btn = document.getElementById("generate-btn");
-    if (btn) {
-        btn.addEventListener('click', function () {
-            btn.innerText = "Recherche…";
-            btn.disabled = true;
-            fetch("{{ url_for('api_proposer_sujet') }}")
-                .then(r => r.json())
-                .then(res => {
-                    btn.innerText = "Proposer un sujet";
-                    btn.disabled = false;
-                    if (res.ok) {
-                        let infos = `
-                            <b>Module :</b> ${res.module}<br>
-                            <b>Matière :</b> ${res.matiere}<br>
-                            <b>Chapitre :</b> ${res.chapitre}<br>
-                            <b>Titre du paragraphe :</b> ${res.titre}
-                        `;
-                        // Fenêtre popup native
-                        let popup = window.open("", "SujetPropose", "width=440,height=320,top=180,left=350");
-                        popup.document.write(`<html><head><title>Sujet proposé</title></head><body style="font-family:sans-serif;padding:30px;text-align:center;"><h3>Sujet proposé</h3><div style='text-align:left;margin:18px auto;font-size:1.12em;max-width:320px;'>${infos}</div><button onclick="window.close();" style="margin-top:16px;font-size:1.05em;padding:8px 24px;cursor:pointer;">Fermer</button></body></html>`);
-                    } else {
-                        alert("Erreur : " + (res.error || "aucun sujet"));
-                    }
-                })
-                .catch(err => {
-                    btn.innerText = "Proposer un sujet";
-                    btn.disabled = false;
-                    alert("Erreur réseau ou serveur.");
-                });
-        });
-    }
-    // Curseur note = init affichage du nombre depuis la valeur
-    let curseur = document.getElementById("note");
-    if (curseur) {
-        let valueSpan = document.getElementById("note-value");
-        if (valueSpan) {
-            valueSpan.innerText = curseur.value;
-        }
-    }
-});
-</script>
