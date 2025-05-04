@@ -1,4 +1,6 @@
-import sqlite3, os
+import psycopg2
+import psycopg2.extras
+import os
 import openai
 import time
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -7,37 +9,40 @@ from datetime import datetime
 from math import ceil
 
 # --- CONFIG ---
-DATA_DIR = "data"
-DB_PATH = os.path.join(DATA_DIR, "testbot.db")
 SECRET_KEY = "super-secret-change-me"
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
 # --- UTILS DB ---
 def get_db():
-    return sqlite3.connect(DB_PATH)
+    return psycopg2.connect(
+        host="dpg-d0bp3v95pdvs73ctvecg-a",
+        dbname="test_aerobot_db",
+        user="test_aerobot_db_user",
+        password="ABq8zFmJODZgCEgGoCxF5GTfNFoXrwCk"
+    )
 
 def get_user_by_username(username):
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT id, username, password, is_admin FROM users WHERE username = ?", (username,))
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT id, username, password, is_admin FROM users WHERE username = %s", (username,))
     row = cur.fetchone()
     conn.close()
     if row:
         return {
-            "id": row[0], "username": row[1], "password": row[2], "is_admin": bool(row[3])
+            "id": row["id"], "username": row["username"], "password": row["password"], "is_admin": bool(row["is_admin"])
         }
     return None
 
 def get_user_by_id(user_id):
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT id, username, is_admin FROM users WHERE id = ?", (user_id,))
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT id, username, is_admin FROM users WHERE id = %s", (user_id,))
     row = cur.fetchone()
     conn.close()
     if row:
         return {
-            "id": row[0], "username": row[1], "is_admin": bool(row[2])
+            "id": row["id"], "username": row["username"], "is_admin": bool(row["is_admin"])
         }
     return None
 
@@ -69,7 +74,7 @@ def testeur_close_session(session_id):
     user_id = session["user_id"]
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT ended_at FROM sessions WHERE id=? AND user_id=?", (session_id, user_id))
+    cur.execute("SELECT ended_at FROM sessions WHERE id=%s AND user_id=%s", (session_id, user_id))
     row = cur.fetchone()
     if not row:
         conn.close()
@@ -79,7 +84,7 @@ def testeur_close_session(session_id):
         conn.close()
         flash("Session déjà clôturée.", "error")
         return redirect(url_for("testeur_session_detail", session_id=session_id))
-    conn.execute("UPDATE sessions SET ended_at=? WHERE id=?", (datetime.utcnow().isoformat(), session_id))
+    cur.execute("UPDATE sessions SET ended_at=%s WHERE id=%s", (datetime.utcnow().isoformat(), session_id))
     conn.commit()
     conn.close()
     flash("Session clôturée.", "success")
@@ -109,7 +114,8 @@ def login():
             session["is_admin"] = user["is_admin"]
             # Dernier login en base (optionnel)
             conn = get_db()
-            conn.execute("UPDATE users SET last_login=? WHERE id=?", (datetime.utcnow().isoformat(), user["id"]))
+            cur = conn.cursor()
+            cur.execute("UPDATE users SET last_login=%s WHERE id=%s", (datetime.utcnow().isoformat(), user["id"]))
             conn.commit()
             conn.close()
             if user["is_admin"]:
@@ -149,7 +155,7 @@ def admin_users():
     nb_pages = int(ceil(total / PER_PAGE)) if total else 1
     offset = (page - 1) * PER_PAGE
     cur.execute(
-        "SELECT id, username, created_at, last_login FROM users WHERE is_admin=0 ORDER BY id LIMIT ? OFFSET ?",
+        "SELECT id, username, created_at, last_login FROM users WHERE is_admin=0 ORDER BY id LIMIT %s OFFSET %s",
         (PER_PAGE, offset)
     )
     users = cur.fetchall()
@@ -179,14 +185,15 @@ def admin_users_add():
             now = datetime.utcnow().isoformat()
             try:
                 conn = get_db()
-                conn.execute(
-                    "INSERT INTO users (username, password, is_admin, created_at) VALUES (?, ?, 0, ?)",
+                cur = conn.cursor()
+                cur.execute(
+                    "INSERT INTO users (username, password, is_admin, created_at) VALUES (%s, %s, 0, %s)",
                     (username, password_generated, now)
                 )
                 conn.commit()
                 conn.close()
                 flash("Testeur créé avec succès !")
-            except sqlite3.IntegrityError:
+            except psycopg2.IntegrityError:
                 flash("Ce nom d'utilisateur existe déjà.", "error")
                 password_generated = None
     return render_template("admin_users_add.html", password_generated=password_generated, username_entered=username_entered)
@@ -197,7 +204,8 @@ def admin_users_add():
 def admin_users_delete(user_id):
     if request.form.get("confirm") == "yes":
         conn = get_db()
-        conn.execute("DELETE FROM users WHERE id=? AND is_admin=0", (user_id,))
+        cur = conn.cursor()
+        cur.execute("DELETE FROM users WHERE id=%s AND is_admin=0", (user_id,))
         conn.commit()
         conn.close()
         flash("Testeur supprimé.", "success")
@@ -216,7 +224,7 @@ def testeur_dashboard():
     conn = get_db()
     cur = conn.cursor()
     cur.execute(
-        "SELECT id, started_at, ended_at FROM sessions WHERE user_id=? ORDER BY started_at DESC",
+        "SELECT id, started_at, ended_at FROM sessions WHERE user_id=%s ORDER BY started_at DESC",
         (user_id,)
     )
     rows = cur.fetchall()
@@ -242,7 +250,7 @@ def testeur_start_session():
     # Vérifier qu'il n'y a pas déjà une session en cours
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT id FROM sessions WHERE user_id=? AND ended_at IS NULL", (user_id,))
+    cur.execute("SELECT id FROM sessions WHERE user_id=%s AND ended_at IS NULL", (user_id,))
     ongoing = cur.fetchone()
     if ongoing:
         flash("Vous avez déjà une session en cours ! Terminez-la avant d'en commencer une nouvelle.", "error")
@@ -251,9 +259,11 @@ def testeur_start_session():
         return redirect(url_for("testeur_session_detail", session_id=ongoing[0]))
 
     started_at = datetime.utcnow().isoformat()
-    cur.execute("INSERT INTO sessions (user_id, started_at) VALUES (?, ?)", (user_id, started_at))
-    session_id = cur.lastrowid
+    cur.execute("INSERT INTO sessions (user_id, started_at) VALUES (%s, %s)", (user_id, started_at))
     conn.commit()
+    # Récupérer l'id de la session nouvellement créée
+    cur.execute("SELECT currval(pg_get_serial_sequence('sessions','id'))")
+    session_id = cur.fetchone()[0]
     conn.close()
     flash("Nouvelle session de test démarrée !", "success")
     # 👉 Redirige immédiatement sur la nouvelle session
@@ -267,7 +277,7 @@ def testeur_session_detail(session_id):
     # Charger la session
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT id, user_id, started_at, ended_at FROM sessions WHERE id=? AND user_id=?", (session_id, user_id))
+    cur.execute("SELECT id, user_id, started_at, ended_at FROM sessions WHERE id=%s AND user_id=%s", (session_id, user_id))
     row = cur.fetchone()
 
     if not row:
@@ -304,48 +314,13 @@ def testeur_session_detail(session_id):
             cur.execute("""
                 INSERT INTO questions 
                   (session_id, question_text, answer_text, appreciation, note, is_correct, rag_used, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (session_id, question_text, answer_text, appreciation, note_int, is_correct, rag_used, now))
             conn.commit()
             flash("Question enregistrée.", "success")
 
     # Récupérer les questions
-    cur.execute("SELECT id, question_text, answer_text, appreciation, note, is_correct, rag_used, created_at FROM questions WHERE session_id=? ORDER BY id ASC", (session_id,))
-    questions = cur.fetchall()
-    conn.close()
-
-    return render_template(
-        "testeur_session_detail.html",
-        session_data=session_data,
-        questions=questions
-    )
-
-    # Ajout d'une question ?
-    if request.method == "POST" and not session_data["ended_at"]:
-        question_text = request.form["question_text"].strip()
-        answer_text = request.form["answer_text"].strip()
-        appreciation = request.form.get("appreciation", "").strip()
-        note = request.form.get("note", "").strip()
-        try:
-            note_int = int(note)
-            if note_int < 0 or note_int > 10:
-                raise ValueError()
-        except Exception:
-            note_int = None
-        now = datetime.utcnow().isoformat()
-
-        if not question_text or not answer_text or note_int is None:
-            flash("Tous les champs sont requis + note de 0 à 10.", "error")
-        else:
-            cur.execute("""
-                INSERT INTO questions (session_id, question_text, answer_text, appreciation, note, created_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (session_id, question_text, answer_text, appreciation, note_int, now))
-            conn.commit()
-            flash("Question enregistrée.", "success")
-
-    # Récupérer les questions
-    cur.execute("SELECT id, question_text, answer_text, appreciation, note, created_at FROM questions WHERE session_id=? ORDER BY id ASC", (session_id,))
+    cur.execute("SELECT id, question_text, answer_text, appreciation, note, is_correct, rag_used, created_at FROM questions WHERE session_id=%s ORDER BY id ASC", (session_id,))
     questions = cur.fetchall()
     conn.close()
 
@@ -401,11 +376,11 @@ def admin_sessions():
                    AVG(note), 
                    MIN(note), 
                    MAX(note),
-                   GROUP_CONCAT(note, ','),
+                   STRING_AGG(note::text, ','),
                    SUM(CASE WHEN is_correct=1 THEN 1 ELSE 0 END),
                    SUM(CASE WHEN rag_used=1 THEN 1 ELSE 0 END)
             FROM questions 
-            WHERE session_id=?
+            WHERE session_id=%s
         """, (sess_id,))
         (
             nb_tot,
@@ -507,7 +482,7 @@ def admin_export_session(session_id):
         SELECT s.id, u.username, s.started_at, s.ended_at
         FROM sessions s
         JOIN users u ON s.user_id = u.id
-        WHERE s.id=?
+        WHERE s.id=%s
     """, (session_id,))
     row = cur.fetchone()
     if not row:
@@ -521,7 +496,7 @@ def admin_export_session(session_id):
     # Questions/réponses
     cur.execute("""
         SELECT question_text, answer_text, appreciation, note, is_correct, rag_used, created_at
-        FROM questions WHERE session_id=?
+        FROM questions WHERE session_id=%s
         ORDER BY created_at ASC
     """, (session_id,))
     questions = cur.fetchall()
