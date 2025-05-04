@@ -63,7 +63,7 @@
                         style="width:220px;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.08em;font-weight:600;text-align:center;background:#a4c927;"
                         onmouseover="this.style.background='#bddf23';"
                         onmouseout="this.style.background='#a4c927';">
-                    Générer une question
+                    Proposer un sujet
                 </button>
             </div>
         </form>
@@ -143,34 +143,32 @@ document.addEventListener('DOMContentLoaded', function () {
     let btn = document.getElementById("generate-btn");
     if (btn) {
         btn.addEventListener('click', function () {
-            btn.innerText = "Génération…";
+            btn.innerText = "Recherche…";
             btn.disabled = true;
-            fetch("{{ url_for('api_generate_question') }}", {
-                method: "POST"
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.ok) {
-                    let q = res.question;
-                    let field = document.getElementById("question_text");
-                    field.value = q;
-                    if (navigator.clipboard) {
-                        navigator.clipboard.writeText(q);
+            fetch("{{ url_for('api_proposer_sujet') }}")
+                .then(r => r.json())
+                .then(res => {
+                    btn.innerText = "Proposer un sujet";
+                    btn.disabled = false;
+                    if (res.ok) {
+                        let infos = `
+                            <b>Module :</b> ${res.module}<br>
+                            <b>Matière :</b> ${res.matiere}<br>
+                            <b>Chapitre :</b> ${res.chapitre}<br>
+                            <b>Titre du paragraphe :</b> ${res.titre}
+                        `;
+                        // Fenêtre popup native
+                        let popup = window.open("", "SujetPropose", "width=440,height=320,top=180,left=350");
+                        popup.document.write(`<html><head><title>Sujet proposé</title></head><body style="font-family:sans-serif;padding:30px;text-align:center;"><h3>Sujet proposé</h3><div style='text-align:left;margin:18px auto;font-size:1.12em;max-width:320px;'>${infos}</div><button onclick="window.close();" style="margin-top:16px;font-size:1.05em;padding:8px 24px;cursor:pointer;">Fermer</button></body></html>`);
+                    } else {
+                        alert("Erreur : " + (res.error || "aucun sujet"));
                     }
-                    btn.innerText = "Générer une question";
+                })
+                .catch(err => {
+                    btn.innerText = "Proposer un sujet";
                     btn.disabled = false;
-                    alert("Question générée et copiée ! Colle-la au besoin dans ton bot.");
-                } else {
-                    alert("Erreur : " + (res.error || 'Échec génération'));
-                    btn.innerText = "Générer une question";
-                    btn.disabled = false;
-                }
-            })
-            .catch(err => {
-                alert("Erreur réseau ou serveur.");
-                btn.innerText = "Générer une question";
-                btn.disabled = false;
-            });
+                    alert("Erreur réseau ou serveur.");
+                });
         });
     }
     // Curseur note = init affichage du nombre depuis la valeur
