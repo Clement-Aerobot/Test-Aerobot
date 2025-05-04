@@ -1,0 +1,278 @@
+body {
+  font-family: 'Montserrat', Arial, sans-serif;
+  background: #f8f9fd;
+  margin: 0;
+  padding: 0 0 100px 0;
+}
+.centered {
+  max-width: 1100px;
+  margin: 36px auto;
+  background: #fff;
+  box-shadow: 0 2px 18px #d2dbfd33;
+  border-radius: 8px;
+  padding: 35px 34px 20px;
+}
+.logo {
+  display: block;
+  margin: 0 auto 14px;
+  width: 290px;
+}
+h2 {
+  color: #144BE8;
+  text-align: center;
+}
+.field {
+  margin-bottom: 13px;
+}
+.label {
+  display: inline-block;
+  min-width: 230px;
+  font-weight: bold;
+  color: #144BE8;
+  font-size: 1.01em;
+  vertical-align: top;
+}
+input[type='text'], input[type='number'], textarea {
+  width: 54vw;
+  font-size: 1em;
+  background: #fbfcff;
+  border: 1px solid #adcbff;
+  border-radius: 7px;
+  padding: 7px 6px;
+  margin-bottom: 3px;
+}
+textarea {
+  min-height: 66px;
+}
+input[readonly], .readonly { background: #e6e6e6; }
+.actions {
+  margin: 22px 0 18px 0;
+  text-align: center;
+}
+.actions a, .actions button {
+  background: #144BE8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 7px 16px !important;
+  margin: 0 7px;
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 3px 8px #b7c5ff30;
+}
+.actions a:hover, .actions button:hover {
+  background: #2970FE;
+}
+.actions .goto input[type="number"] {
+  width: 84px;
+  text-align: center;
+  background: #edeefe;
+  border: 1px solid #b7c8f5;
+}
+
+.flash { color: #13a13e; text-align: center;}
+.flash-error { color: #e81d0a; text-align: center;}
+
+.floating-buttons {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 22px;
+  z-index: 99;
+}
+.btn-main {
+  padding: 16px 0 !important;
+  border-radius: 13px !important;
+  font-size: 1.15em;
+  background: #114be8;
+  color: white;
+  border: none;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: bold;
+  box-shadow: 0 4px 22px #b7c5ff44;
+  width: 100%;
+  margin: 0 auto 16px auto;
+  display: block;
+  transition: background 0.17s, color 0.17s, opacity 0.17s;
+}
+.btn-main:last-child {
+  margin-bottom: 0 !important;
+}
+.btn-main:hover {
+  background: #2970FE;
+  color: #fff;
+  opacity: 0.97;
+}
+
+@media (max-width: 900px) {
+  .centered { padding: 13px 2vw; }
+}
+
+/* ---------------------- PAGE LOGIN SPÉCIFIQUE ---------------------- */
+.login-fields {
+  display: flex;
+  flex-direction: column;
+  margin-top: 22px;
+  align-items: center;
+}
+.login-label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #144BE8;
+  font-size: 1.06em;
+  align-self: flex-start;
+}
+.login-input {
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  border: 1px solid #adcbff;
+  font-size: 1.05em;
+  background: #fbfcff;
+  transition: box-shadow 0.18s;
+  width: 100%;
+  max-width: 340px;
+  box-sizing: border-box;
+  height: 44px;
+  font-family: 'Montserrat', Arial, sans-serif;
+  line-height: 1.25;
+  appearance: none;
+}
+.login-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #c6defe66;
+  border-color: #2277ffcc;
+}
+.centered h2 {
+  text-align:center;
+  margin-top:20px;
+}
+
+/* ------------- Groupes harmonisés pour alignement parfait ------------ */
+.row-flex {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+/* ID étroit, case à droite large (pour Numéro de page) */
+.group-2-first {
+  flex: 0 0 110px;
+  max-width: 110px;
+  min-width: 80px;
+  width: 110px;
+}
+.group-2-rest {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Groupes homogènes pour trois ou quatre colonnes */
+.group-3, .group-4 {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.row-flex > .group-2-first,
+.row-flex > .group-2-rest,
+.row-flex > .group-3,
+.row-flex > .group-4 {
+  margin-right: 0;
+}
+
+.group-2-first input,
+.group-2-rest input,
+.group-3 input,
+.group-4 input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+.field,
+.field input,
+.field textarea {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+.label-up {
+  display: block;
+  font-weight: 600;
+  color: #144BE8;
+  font-size: 1.04em;
+  margin-bottom: 5px;
+  letter-spacing: .02em;
+}
+
+/* Forcer tous les labels des champs à être au-dessus sur toute la page */
+.field .label,
+.label-up {
+  display: block !important;
+  min-width: 0 !important;
+  margin: 0 0 5px 0 !important;
+  vertical-align: unset !important;
+}
+
+/* ----------- BOUTONS FLOTTANTS VERTICAUX ALIGNÉS ------------- */
+#float-buttons-block {
+  position: fixed;
+  top: 50%;
+  right: 32px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1000;
+  min-width: 200px;
+  width: 210px;
+}
+#float-buttons-block .btn-main {
+  width: 100%;
+  margin: 0 auto 16px auto;
+  font-size: 1.15em !important;
+  padding: 16px 0 !important;
+  border-radius: 13px !important;
+  font-family: 'Montserrat', Arial, sans-serif;
+  transition: background 0.17s, color 0.17s, opacity 0.17s;
+  display: block;
+}
+#float-buttons-block .btn-main:last-child {
+  margin-bottom: 0 !important;
+}
+#float-buttons-block .btn-main:hover {
+  background: #2970FE;
+  color: #fff;
+  opacity: 0.97;
+}
+@media (max-width: 900px) {
+  #float-buttons-block {
+    right: 50%;
+    left: 50%;
+    top: unset;
+    bottom: 18px;
+    width: 90vw;
+    min-width: unset;
+    max-width: 430px;
+    transform: translateX(-50%);
+    align-items: stretch;
+  }
+  #float-buttons-block .btn-main {
+    font-size: 1em !important;
+    padding: 12px 0 !important;
+    min-width: 80px;
+    border-radius: 9px !important;
+    margin: 0 0 11px 0 !important;
+  }
+  #float-buttons-block .btn-main:last-child {
+    margin-bottom: 0 !important;
+  }
+}
