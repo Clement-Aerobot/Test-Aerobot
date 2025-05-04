@@ -19,7 +19,7 @@ app.secret_key = SECRET_KEY
 SUJETS_PATH = "sujets.csv"
 SUJETS = []
 with open(SUJETS_PATH, newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
+    reader = csv.DictReader(f, delimiter=';')
     for row in reader:
         SUJETS.append(row)
 
