@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Export Session n°{{ session.id }}{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:auto;">
+    <h2>Export complet — Session n°{{ session.id }}</h2>
+    <p>
+        <b>Testeur :</b> {{ session.username }}<br>
+        <b>Date début :</b> {{ session.started_at or '-' }}<br>
+        <b>Date fin :</b> {{ session.ended_at or '-' }}<br>
+    </p>
+    <h3>Questions et réponses</h3>
+    <ol>
+    {% for q in questions %}
+      <li style="margin-bottom:20px;border:1px solid #d2dbfd;padding:14px 12px 7px 12px;border-radius:10px;">
+        <b>Question :</b><br>
+        <span style="margin-left:12px;">{{ q[0] }}</span><br>
+        <b>Réponse :</b><br>
+        <span style="margin-left:12px;">{{ q[1] }}</span><br>
+        <b>Appréciation :</b> {{ q[2] or '-' }}<br>
+        <b>Note :</b> {{ q[3] or '-' }}<br>
+        <b>Correct :</b> {% if q[4]==1 %}<span style="color:#13a13e;">✅ Oui</span>{% else %}<span style="color:#e81d0a;">❌ Non</span>{% endif %}<br>
+        <b>RAG utilisé :</b> {% if q[5]==1 %}📚 Oui{% else %}—{% endif %}<br>
+        <b>Date :</b> {{ q[6] }}
+      </li>
+    {% endfor %}
+    {% if not questions %}
+      <li style="color:#888;font-style:italic;">Aucune question saisie sur cette session.</li>
+    {% endif %}
+    </ol>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Accueil Testeur — Testbot Aviation{% endblock %}
+{% block content %}
+<h2 style="text-align:center;">Tableau de bord — Espace Testeur</h2>
+<p style="text-align:center;">Bienvenue, <b>{{ user.username }}</b>.</p>
+
+<!-- Ligne des deux gros boutons -->
+<div style="display: flex; justify-content: center; gap: 24px; margin: 34px 0 24px 0;">
+    <a class="btn-main"
+       href="{{ url_for('testeur_dashboard') }}"
+       style="
+         width: 230px;
+         height: 48px;
+         line-height: 48px;
+         display: inline-block;
+         text-align: center;
+         font-size: 1.09em;
+         font-weight: 600;
+         text-decoration: none;
+         white-space: nowrap;
+         vertical-align: middle;
+         padding: 0;"
+    >Lancer un test</a>
+    <a class="btn-main"
+       href="https://www.aerobot.dashboard.aimw.ai/"
+       target="_blank"
+       rel="noopener"
+       style="
+         width: 230px;
+         height: 48px;
+         line-height: 48px;
+         display: inline-block;
+         text-align: center;
+         font-size: 1.09em;
+         font-weight: 600;
+         text-decoration: none;
+         white-space: nowrap;
+         vertical-align: middle;
+         padding: 0;"
+    >Accéder au bot</a>
+</div>
+
+<!-- Tutoriel -->
+<div style="display: flex; justify-content: center;">
+    <a class="btn-main"
+       href="https://aerobotamodifier-my.sharepoint.com/:f:/g/personal/emmanuel_aero-bot_fr/Ek0HozdUmb1EsR_XCv30EnYB-MRa-5kr2-ZYC42E_xBeNQ?e=1aAfpY"
+       target="_blank"
+       rel="noopener"
+       style="
+         width: 230px;
+         height: 48px;
+         line-height: 48px;
+         margin-top: 2px;
+         display: inline-block;
+         text-align: center;
+         font-size: 1.09em;
+         font-weight: 600;
+         text-decoration: none;
+         white-space: nowrap;
+         vertical-align: middle;
+         padding: 0;"
+    >Tutoriel</a>
+</div>
+
+<!-- Déconnexion petit bouton centré -->
+<div style="width:100%; display:flex; justify-content:center; margin-top:46px;">
+    <a class="btn-main"
+       href="{{ url_for('logout') }}"
+       style="width:120px;height:38px;line-height:38px;text-align:center;
+              font-size:1em;padding:0; background:#bb0d3b;">
+        Déconnexion
+    </a>
+</div>
+{% endblock %}

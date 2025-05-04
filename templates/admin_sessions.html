@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Sessions des testeurs{% endblock %}
+{% block content %}
+<h2>Toutes les sessions de test</h2>
+<table style="width:100%;margin:32px 0 0 0;">
+    <tr style="background:#eaefff;font-weight:bold;">
+        <td>Session</td>
+        <td>Testeur</td>
+        <td>Début</td>
+        <td>Fin</td>
+        <td>Durée</td>
+        <td># Questions</td>
+        <td>Moyenne</td>
+        <td>Médiane</td>
+        <td>Min</td>
+        <td>Max</td>
+        <td>% Réussite</td>
+        <td>% Conformité</td>
+        <td>Export</td>
+    </tr>
+    {% for sess in sessions %}
+      <tr>
+        <td>{{ sess.id }}</td>
+        <td>{{ sess.username }}</td>
+        <td>{{ sess.started_at or '-' }}</td>
+        <td>{{ sess.ended_at or '-' }}</td>
+        <td>{{ sess.duree }}</td>
+        <td style="text-align:center;">{{ sess.nb_tot }}</td>
+        <td style="text-align:center;">{{ sess.moyenne }}</td>
+        <td style="text-align:center;">{{ sess.mediane }}</td>
+        <td style="text-align:center;">{{ sess.mini }}</td>
+        <td style="text-align:center;">{{ sess.maxi }}</td>
+        <td style="text-align:center;">{{ sess.pct_reussite }}%</td>
+        <td style="text-align:center;">{{ sess.pct_conformite }}%</td>
+        <td>
+          <a class="btn-main" href="{{ url_for('admin_export_session', session_id=sess.id) }}" target="_blank">Exporter</a>
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not sessions %}
+        <tr><td colspan="13" style="text-align:center;color:#888;font-style:italic;">Aucune session enregistrée pour l’instant.</td></tr>
+    {% endif %}
+</table>
+
+<div class="actions" style="margin-top: 34px;">
+    <a href="{{ url_for('home_admin') }}" class="btn-main">⬅ Retour admin</a>
+</div>
+{% endblock %}

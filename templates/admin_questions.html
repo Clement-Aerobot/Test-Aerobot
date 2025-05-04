@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Toutes les questions/réponses des testeurs{% endblock %}
+{% block content %}
+<h2>Résultats tests — Toutes les questions/réponses</h2>
+
+<table style="width:100%;margin:32px 0 0 0;">
+    <tr style="background:#eaefff;font-weight:bold;">
+        <td>#</td>
+        <td>Testeur</td>
+        <td>Session</td>
+        <td>Date</td>
+        <td>Question</td>
+        <td>Réponse</td>
+        <td>Note</td>
+        <td>Appréciation</td>
+        <td>Correct</td>
+        <td>RAG</td>
+    </tr>
+    {% for q in questions %}
+      <tr>
+        <td>{{ q[0] }}</td>
+        <td>{{ q[1] }}</td>
+        <td>{{ q[2] }}</td>
+        <td style="font-size:0.93em;">{{ q[3] }}</td>
+        <td style="max-width:200px;word-break:break-all;">{{ q[4] }}</td>
+        <td style="max-width:200px;word-break:break-all;">{{ q[5] }}</td>
+        <td style="text-align:center;">{{ q[6] }}</td>
+        <td>{{ q[7] }}</td>
+        <td style="text-align:center;">{% if q[8] == 1 %}✅{% else %}❌{% endif %}</td>
+        <td style="text-align:center;">{% if q[9] == 1 %}📚{% else %}—{% endif %}</td>
+      </tr>
+    {% endfor %}
+    {% if not questions %}
+        <tr><td colspan="10" style="text-align:center;color:#888;font-style:italic;">Aucune question enregistrée pour l’instant.</td></tr>
+    {% endif %}
+</table>
+
+<div class="actions" style="margin-top: 34px;">
+    <a href="{{ url_for('home_admin') }}" class="btn-main">⬅ Retour admin</a>
+</div>
+{% endblock %}

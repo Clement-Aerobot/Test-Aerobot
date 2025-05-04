@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Mes sessions de test{% endblock %}
+{% block content %}
+<h2 style="text-align:center;">Mes sessions de test</h2>
+
+<!-- Boutons parfaitement centrés, mêmes tailles, même alignement -->
+<div style="width:100%;display:flex;justify-content:center;margin:30px 0 32px 0;">
+  <form method="post" action="{{ url_for('testeur_start_session') }}" style="margin:0; padding:0;">
+    <button type="submit"
+            class="btn-main"
+            style="
+              width:220px;
+              height:48px;
+              font-size:1.08em;
+              font-weight:600;
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+              text-align:center;
+              text-decoration:none;
+              background:#144BE8;
+              color:white;
+              border-radius:8px;
+              border:none;
+              box-shadow:0 2px 8px #d2dbfd33;
+              box-sizing:border-box;
+              margin:0;
+              padding:0;
+              cursor:pointer;"
+      onmouseover="this.style.background='#2970FE';"
+      onmouseout="this.style.background='#144BE8';"
+      >
+      🟢 Démarrer une session de test
+    </button>
+  </form>
+  <a href="{{ url_for('home_testeur') }}"
+     class="btn-main"
+     style="
+       width:220px;
+       height:48px;
+       font-size:1.08em;
+       font-weight:600;
+       display:inline-flex;
+       align-items:center;
+       justify-content:center;
+       text-align:center;
+       text-decoration:none;
+       background:#888;
+       color:white;
+       border-radius:8px;
+       border:none;
+       box-shadow:0 2px 8px #d2dbfd33;
+       box-sizing:border-box;
+       margin:0 0 0 24px;
+       padding:0;
+       cursor:pointer;"
+       onmouseover="this.style.background='#aaa';"
+       onmouseout="this.style.background='#888';"
+     >
+    Retour Accueil
+  </a>
+</div>
+
+<table style="width:100%;margin:36px 0 0 0;border-collapse:collapse;">
+    <tr style="background:#eaefff;font-weight:bold;">
+        <td style="text-align:center;vertical-align:middle;">ID session</td>
+        <td style="text-align:center;vertical-align:middle;">Début</td>
+        <td style="text-align:center;vertical-align:middle;">Fin</td>
+        <td style="text-align:center;vertical-align:middle;">État</td>
+        <td style="text-align:center;vertical-align:middle;">Détail</td>
+    </tr>
+    {% for sess in sessions %}
+      <tr>
+        <td style="text-align:center;vertical-align:middle;">{{ sess.id }}</td>
+        <td style="text-align:center;vertical-align:middle;">{{ sess.started_at|default('-') }}</td>
+        <td style="text-align:center;vertical-align:middle;">{{ sess.ended_at|default('-') }}</td>
+        <td style="text-align:center;vertical-align:middle;">
+          {% if not sess.ended_at %}
+              <span style="color:#ff8800; font-weight:bold;">🟠 En cours</span>
+          {% else %}
+              <span style="color:#13a13e; font-weight:bold;">🟢 Clôturée</span>
+          {% endif %}
+        </td>
+        <td style="text-align:center;vertical-align:middle;">
+          <a href="{{ url_for('testeur_session_detail', session_id=sess.id) }}"
+             style="color:#144be8;text-decoration:none;font-weight:600;display:inline-block;">
+             Voir détails
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not sessions %}
+      <tr>
+        <td colspan="5" style="text-align:center;font-style:italic;color:#888;vertical-align:middle;">
+          Aucune session encore démarrée.
+        </td>
+      </tr>
+    {% endif %}
+</table>
+
+{% endblock %}

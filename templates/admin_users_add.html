@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Ajouter un testeur{% endblock %}
+{% block content %}
+<h2 style="text-align:center;">Créer un testeur</h2>
+
+<form method="post" style="max-width:440px;margin:32px auto 0 auto;">
+    <div class="field" style="width:100%;">
+        <label class="label-up" for="username" style="text-align:center;">Identifiant du testeur *</label>
+        <input type="text" name="username" id="username" required value="{{ username_entered or '' }}"
+               style="width:100%;max-width:350px;height:32px;text-align:center;font-size:1.05em;">
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:14px;width:100%;">
+        <button type="submit" class="btn-main"
+            style="
+                width:150px; height:32px;
+                display:flex; align-items:center; justify-content:center;
+                font-size:1em; font-weight:600;
+                background:#144BE8; color:white;
+                border-radius:6px; border:none;
+                box-shadow:0 2px 8px #d2dbfd33;
+                cursor:pointer; text-decoration:none;
+                padding:0; margin:0;
+            "
+            onmouseover="this.style.background='#2970FE';"
+            onmouseout="this.style.background='#144BE8';"
+        >
+            Créer ce testeur
+        </button>
+        <a href="{{ url_for('admin_users') }}" class="btn-main"
+            style="
+                width:150px; height:32px;
+                display:flex; align-items:center; justify-content:center;
+                font-size:1em; font-weight:600;
+                background:#888; color:#fff;
+                border-radius:6px; border:none;
+                box-shadow:0 2px 8px #d2dbfd33;
+                text-decoration:none; cursor:pointer;
+                padding:0; margin:0;
+            "
+            onmouseover="this.style.background='#bbb';"
+            onmouseout="this.style.background='#888';"
+        >
+            Annuler
+        </a>
+    </div>
+</form>
+
+{% if password_generated %}
+  <div style="max-width:560px;margin:32px auto 0 auto;">
+    <div class="flash" style="font-size:1.13em;">
+      <b>Testeur créé : identifiant <span style="color:#144be8">{{ username_entered }}</span></b><br>
+      <span style="display:inline-block;margin-top:8px;">
+        <b>Mot de passe généré :</b>
+        <input type="text" readonly style="width:140px;text-align:center;" value="{{ password_generated }}">
+      </span>
+      <br>
+      <span style="color:#e81d0a;font-size:0.97em;">
+        Ce mot de passe <b>ne sera plus affiché</b> : note-le avant de quitter la page !
+      </span>
+    </div>
+  </div>
+{% endif %}
+
+<div style="display:flex;justify-content:center;margin-top:28px;">
+    <a href="{{ url_for('admin_users') }}" class="btn-main"
+       style="
+            width:150px; height:32px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1em; font-weight:600;
+            background:#144BE8; color:#fff;
+            border-radius:6px; border:none;
+            box-shadow:0 2px 8px #d2dbfd33;
+            text-decoration:none; cursor:pointer;
+            padding:0; margin:0;
+        "
+        onmouseover="this.style.background='#2970FE';"
+        onmouseout="this.style.background='#144BE8';"
+    >
+        ⬅ Retour à la liste des testeurs
+    </a>
+</div>
+{% endblock %}

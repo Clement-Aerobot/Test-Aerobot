@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Accueil Admin — Testbot Aviation{% endblock %}
+{% block content %}
+<h2 style="text-align:center;">Tableau de bord — Espace Admin</h2>
+<p style="text-align:center;">Bienvenue, <b>{{ user.username }}</b>.</p>
+
+{% if stats %}
+<div style="background:#eaf3f6;padding:18px 22px 8px 22px;border-radius:12px;max-width:440px;margin:32px auto 36px auto;box-shadow:0 2px 8px #d2dbfd66;">
+   <h3 style="color:#144be8;text-align:center;margin-bottom:16px;">Statistiques globales</h3>
+   <table style="width:100%;font-size:1.09em;">
+     <tr><td><b>Questions répondues</b></td><td style="text-align:right;">{{ stats.total_questions }}</td></tr>
+     <tr><td><b>% Réussite</b></td><td style="text-align:right;">{{ stats.pct_reussite }} %</td></tr>
+     <tr><td><b>% Conformité</b></td><td style="text-align:right;">{{ stats.pct_conformite }} %</td></tr>
+     <tr><td><b>Note moyenne</b></td><td style="text-align:right;">{{ stats.note_moy }}</td></tr>
+   </table>
+</div>
+{% endif %}
+
+<!-- Actions admin : boutons bien alignés -->
+<div style="display:flex; justify-content:center; gap:24px; margin:38px 0 48px 0;">
+    <a class="btn-main"
+        href="{{ url_for('admin_users') }}"
+        style="width:210px; height:46px; display:inline-flex; align-items:center; justify-content:center; font-size:1.09em; font-weight:600; text-align:center; text-decoration:none; background:#144BE8; color:white; border-radius:8px; border:none; box-shadow:0 2px 8px #d2dbfd33; cursor:pointer;"
+        onmouseover="this.style.background='#2970FE';"
+        onmouseout="this.style.background='#144BE8';">
+      👤 Gérer les testeurs
+    </a>
+    <a class="btn-main"
+        href="{{ url_for('admin_sessions') }}"
+        style="width:210px; height:46px; display:inline-flex; align-items:center; justify-content:center; font-size:1.09em; font-weight:600; text-align:center; text-decoration:none; background:#144BE8; color:white; border-radius:8px; border:none; box-shadow:0 2px 8px #d2dbfd33; cursor:pointer;"
+        onmouseover="this.style.background='#2970FE';"
+        onmouseout="this.style.background='#144BE8';">
+      📋 Statistiques sessions
+    </a>
+    <a class="btn-main"
+        href="{{ url_for('admin_questions') }}"
+        style="width:210px; height:46px; display:inline-flex; align-items:center; justify-content:center; font-size:1.09em; font-weight:600; text-align:center; text-decoration:none; background:#144BE8; color:white; border-radius:8px; border:none; box-shadow:0 2px 8px #d2dbfd33; cursor:pointer;"
+        onmouseover="this.style.background='#2970FE';"
+        onmouseout="this.style.background='#144BE8';">
+      🔎 Voir toutes les questions
+    </a>
+</div>
+
+<!-- Bouton déconnexion bien rouge, centré, petit -->
+<div style="width:100%; display:flex; justify-content:center; margin-top:26px;">
+    <a class="btn-main"
+       href="{{ url_for('logout') }}"
+       style="width:120px; height:38px; display:inline-flex; align-items:center; justify-content:center; font-size:1em; font-weight:600; text-align:center; text-decoration:underline; background:#e81d0a; color:white; border-radius:6px; border:none; box-shadow:0 2px 8px #d2dbfd33; cursor:pointer;"
+       onmouseover="this.style.background='#b72829';"
+       onmouseout="this.style.background='#e81d0a';">
+      Déconnexion
+    </a>
+</div>
+{% endblock %}

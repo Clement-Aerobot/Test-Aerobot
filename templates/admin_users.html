@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Gestion des testeurs{% endblock %}
+{% block content %}
+<h2 style="text-align:center;">Gestion des testeurs</h2>
+
+<!-- Deux petits boutons sur la même ligne, centrés, au-dessus du tableau -->
+<div style="display:flex;justify-content:center;gap:22px;margin:24px 0 18px 0;">
+    <a href="{{ url_for('admin_users_add') }}"
+       class="btn-main"
+       style="width:164px; height:26px; display:flex; align-items:center; justify-content:center; font-size:1em; font-weight:600; text-decoration:none; background:#144BE8; color:white; border-radius:6px; border:none; box-shadow:0 2px 8px #d2dbfd33; cursor:pointer;"
+       onmouseover="this.style.background='#2970FE';"
+       onmouseout="this.style.background='#144BE8';">
+        Créer un testeur
+    </a>
+    <a href="{{ url_for('home_admin') }}"
+       class="btn-main"
+       style="width:164px; height:26px; display:flex; align-items:center; justify-content:center; font-size:1em; font-weight:600; text-decoration:none; background:#888; color:#fff; border-radius:6px; border:none; box-shadow:0 2px 8px #d2dbfd33; cursor:pointer;"
+       onmouseover="this.style.background='#bbb';"
+       onmouseout="this.style.background='#888';">
+        ⬅ Retour admin
+    </a>
+</div>
+
+<table style="width:100%;margin-top:8px;border-collapse:collapse;">
+    <tr style="background:#eaefff;font-weight:bold;">
+        <td style="text-align:center;vertical-align:middle;">Identifiant</td>
+        <td style="text-align:center;vertical-align:middle;">Date création</td>
+        <td style="text-align:center;vertical-align:middle;">Dernier login</td>
+        <td style="text-align:center;vertical-align:middle;width:120px;">Actions</td>
+    </tr>
+    {% for user in users %}
+      <tr>
+        <td style="text-align:center;vertical-align:middle;">{{ user[1] }}</td>
+        <td style="text-align:center;vertical-align:middle;">{{ user[2] or "-" }}</td>
+        <td style="text-align:center;vertical-align:middle;">{{ user[3] or "-" }}</td>
+        <td style="text-align:center;vertical-align:middle;">
+            <form method="post" action="{{ url_for('admin_users_delete', user_id=user[0]) }}" style="display:inline;">
+                <input type="hidden" name="confirm" value="yes">
+                <a href="#" style="color:#e81d0a; font-weight:600; text-decoration:underline;cursor:pointer;"
+                   onclick="if(confirm('Supprimer ce testeur ? Opération irréversible !')){this.closest('form').submit();} return false;">
+                    Supprimer
+                </a>
+            </form>
+        </td>
+      </tr>
+    {% endfor %}
+    {% if not users %}
+      <tr>
+        <td colspan="4" style="text-align:center;font-style:italic;color:#888;vertical-align:middle;">
+          Aucun testeur enregistré pour l’instant.
+        </td>
+      </tr>
+    {% endif %}
+</table>
+{% endblock %}

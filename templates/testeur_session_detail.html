@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Session n°{{ session_data.id }} — Testbot Aviation{% endblock %}
+{% block content %}
+<h2 style="text-align:center;">Session de test n°{{ session_data.id }}</h2>
+<p style="text-align:center;">
+    <b>Début :</b> {{ session_data.started_at }}<br>
+    <b>Fin :</b> {{ session_data.ended_at or '<span style="color:#13a13e">En cours</span>'|safe }}
+</p>
+
+{% if not session_data.ended_at %}
+    <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 28px;">
+        <form method="post" style="display:flex; flex-direction:column; align-items:center; width:100%; max-width:580px;">
+            <!-- Question posée -->
+            <div class="field" style="width:100%;">
+                <label class="label-up" for="question_text" style="text-align:center;">Question posée *</label>
+                <textarea name="question_text" id="question_text" required style="width:100%;"></textarea>
+            </div>
+            <!-- Réponse du bot (double hauteur) -->
+            <div class="field" style="width:100%;">
+                <label class="label-up" for="answer_text" style="text-align:center;">Réponse du bot *</label>
+                <textarea name="answer_text" id="answer_text" required style="width:100%; min-height: 132px;"></textarea>
+            </div>
+            <!-- Appréciation (une ligne, style question) -->
+            <div class="field" style="width:100%;">
+                <label class="label-up" for="appreciation" style="text-align:center;">Appréciation</label>
+                <textarea name="appreciation" id="appreciation" style="width:100%; min-height: 66px;"></textarea>
+            </div>
+            <!-- Note curseur joli -->
+            <div class="field" style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top:14px;">
+                <label class="label-up" for="note" style="text-align:center;">Note (0 à 10) *</label>
+                <input type="range" id="note" name="note" min="0" max="10" value="5"
+                    style="width:80%;max-width:330px; margin:12px 0 0 0;"
+                    oninput="document.getElementById('note-value').innerText = this.value;">
+                <div style="width:80%;max-width:330px; display:flex; justify-content:space-between; font-size:0.98em; color:#144be8;">
+                    <span>0</span>
+                    <span id="note-value" style="font-weight:bold; color:#114BE8;">5</span>
+                    <span>10</span>
+                </div>
+            </div>
+            <!-- Cases à cocher correct/rag -->
+            <div class="row-flex" style="margin-top:10px; width:100%; justify-content:center;">
+                <div class="group-3" style="text-align:center;">
+                    <label style="cursor:pointer;">
+                        <input type="checkbox" name="is_correct" value="1" style="vertical-align:middle; cursor:pointer;"> Réponse correcte
+                    </label>
+                </div>
+                <div class="group-3" style="text-align:center;">
+                    <label style="cursor:pointer;">
+                        <input type="checkbox" name="rag_used" value="1" style="vertical-align:middle; cursor:pointer;"> Utilisation du RAG
+                    </label>
+                </div>
+            </div>
+            <!-- Groupe boutons propre -->
+            <div style="display:flex; gap:22px; justify-content:center; margin-top:26px; width:100%;">
+                <button type="submit" class="btn-main"
+                        style="width:220px;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.08em;font-weight:600;text-align:center;background:#144BE8;"
+                        onmouseover="this.style.background='#2970FE';"
+                        onmouseout="this.style.background='#144BE8';">
+                    Ajouter cette question
+                </button>
+                <button type="button" id="generate-btn"
+                        class="btn-main"
+                        style="width:220px;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.08em;font-weight:600;text-align:center;background:#a4c927;"
+                        onmouseover="this.style.background='#bddf23';"
+                        onmouseout="this.style.background='#a4c927';">
+                    Générer une question
+                </button>
+            </div>
+        </form>
+        <!-- Clôturer la session -->
+        <form method="post"
+              action="{{ url_for('testeur_close_session', session_id=session_data.id) }}"
+              style="margin-top:20px;">
+            <button type="submit" class="btn-main"
+                    style="width:220px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.08em;background:#e81d0a;"
+                    onmouseover="this.style.background='#b72829';"
+                    onmouseout="this.style.background='#e81d0a';">
+                ❌ Clôturer la session
+            </button>
+        </form>
+    </div>
+    <!-- AVERTISSEMENT Retour -->
+    <div style="max-width:540px;margin:30px auto 0 auto; text-align:center; background:#f9eede; color:#b28f12; border-radius:10px; padding:15px 24px 11px 24px; font-size:1.07em;">
+        <b>⚠️ Attention :</b> Il est conseillé de <b>clôturer</b> la session avant de revenir à vos sessions.<br>
+        <a href="{{ url_for('testeur_dashboard') }}"
+           onclick="return confirm('Êtes-vous sûr de vouloir revenir sans avoir clôturé la session ? Les réponses non sauvegardées seront perdues.');"
+           class="btn-main"
+           style="margin-top:14px; display:inline-block; background:#888; color:white; width:360px; height:38px; line-height:38px; font-size:1em; font-weight:600; text-align:center; box-shadow:0 2px 8px #d2dbfd33; border-radius:6px; cursor:pointer; text-decoration:none;"
+           onmouseover="this.style.background='#bbb';"
+           onmouseout="this.style.background='#888';">
+           ⬅ Retour à mes sessions
+        </a>
+    </div>
+{% else %}
+    <div class="flash" style="font-size:1.06em;color:#888;text-align:center;">Session clôturée</div>
+    <div style="max-width:540px;margin:30px auto 0 auto; text-align:center;">
+        <a href="{{ url_for('testeur_dashboard') }}"
+           class="btn-main"
+           style="margin-top:16px; display:inline-block; background:#888; color:white; width:360px; height:38px; line-height:38px; font-size:1em; font-weight:600; text-align:center; box-shadow:0 2px 8px #d2dbfd33; border-radius:6px; cursor:pointer; text-decoration:none;"
+           onmouseover="this.style.background='#bbb';"
+           onmouseout="this.style.background='#888';">
+           ⬅ Retour à mes sessions
+        </a>
+    </div>
+{% endif %}
+
+<h3 style="text-align:center; margin-top:40px;">Questions saisies durant cette session</h3>
+<table style="width:96%; margin:18px auto 0 auto; border-collapse:collapse; font-size:1.045em;">
+    <tr style="background:#eaefff;font-weight:bold;">
+        <td style="text-align:center;vertical-align:middle;">#</td>
+        <td style="text-align:center;vertical-align:middle;max-width:380px;">Question</td>
+        <td style="text-align:center;vertical-align:middle;">Appréciation</td>
+        <td style="text-align:center;vertical-align:middle;">Note</td>
+        <td style="text-align:center;vertical-align:middle;">Juste</td>
+        <td style="text-align:center;vertical-align:middle;">RAG</td>
+    </tr>
+    {% for q in questions %}
+      <tr>
+        <td style="text-align:center;vertical-align:middle;">{{ loop.index }}</td>
+        <td style="max-width:380px;word-break:break-all; text-align:center; vertical-align:middle;">
+          {{ q[1][:120] }}{% if q[1]|length > 120 %}...{% endif %}
+        </td>
+        <td style="text-align:center;vertical-align:middle;">{{ q[3] }}</td>
+        <td style="text-align:center;vertical-align:middle;">{{ q[4] }}</td>
+        <td style="text-align:center;vertical-align:middle;">{% if q[5] == 1 %}✅{% else %}❌{% endif %}</td>
+        <td style="text-align:center;vertical-align:middle;">{% if q[6] == 1 %}📚{% else %}—{% endif %}</td>
+      </tr>
+    {% endfor %}
+    {% if not questions %}
+        <tr>
+            <td colspan="6" style="text-align:center;color:#888;font-style:italic;vertical-align:middle;">
+                Aucune question encore saisie.
+            </td>
+        </tr>
+    {% endif %}
+</table>
+
+{% endblock %}
+
+<!-- JS inchangé -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let btn = document.getElementById("generate-btn");
+    if (btn) {
+        btn.addEventListener('click', function () {
+            btn.innerText = "Génération…";
+            btn.disabled = true;
+            fetch("{{ url_for('api_generate_question') }}", {
+                method: "POST"
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.ok) {
+                    let q = res.question;
+                    let field = document.getElementById("question_text");
+                    field.value = q;
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(q);
+                    }
+                    btn.innerText = "Générer une question";
+                    btn.disabled = false;
+                    alert("Question générée et copiée ! Colle-la au besoin dans ton bot.");
+                } else {
+                    alert("Erreur : " + (res.error || 'Échec génération'));
+                    btn.innerText = "Générer une question";
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                alert("Erreur réseau ou serveur.");
+                btn.innerText = "Générer une question";
+                btn.disabled = false;
+            });
+        });
+    }
+    // Curseur note = init affichage du nombre depuis la valeur
+    let curseur = document.getElementById("note");
+    if (curseur) {
+        let valueSpan = document.getElementById("note-value");
+        if (valueSpan) {
+            valueSpan.innerText = curseur.value;
+        }
+    }
+});
+</script>
